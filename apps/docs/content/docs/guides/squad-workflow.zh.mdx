@@ -118,8 +118,8 @@ issue 状态设为 `todo`（默认），小队队长会立刻被触发。
 
    两条子 issue 独立无依赖，都设 `--status todo` 即可并行推进。`--assignee` 已触发对应智能体，**不需要队长再 `@` 一次**——创建子 issue 并分配就是触发动作。
 
-3. 两个智能体**并行工作**——前端写组件和预览裁剪，后端写 API 和 S3 上传逻辑。
-4. 后端智能体先完成，发了 API 文档评论。前端智能体等后端 API 就绪后继续对接。
+3. 两个智能体**并行工作**——前端写组件和预览裁剪，后端写 API 和 S3 上传逻辑。双方按事先约定的 API 契约各自推进，不需要互相等待。
+4. 后端智能体先完成，发了 API 文档评论；前端智能体拿到契约后也已独立完成对接。
 5. 两条子 issue 都完成后，队长发一条总结评论，把父 issue 切到 `in_review`。
 6. 人类 tech lead review 两个 PR，合并，切 `done`。
 
@@ -131,13 +131,13 @@ issue 状态设为 `todo`（默认），小队队长会立刻被触发。
 
 **流程**：
 
-1. 在 GitHub 仓库里配置 webhook，监听 `workflow_run` 事件，filter 限定 `conclusion: failure`。webhook 到达 Multica 后触发创建 issue 动作，自动建一条 issue "CI 失败：`pnpm typecheck` 报错"，assignee 选 `DevOps Squad`。
+1. 在 GitHub Actions workflow 的失败处理步骤中，显式调用 Multica [自动化](/autopilots) webhook 触发 `create_issue` 动作，自动建一条 issue "CI 失败：`pnpm typecheck` 报错"，assignee 选 `DevOps Squad`。
 2. 队长评估 CI 失败日志（已附在 issue 描述中），判断是类型错误，`@` 小队里负责 TypeScript 的智能体。
 3. 智能体读 CI 日志，定位到最近的 PR 引入了一个类型不兼容的改动，发评论说明根因并给出 fix 建议。
 4. 队长把 issue 切到 `in_review`，`@` 对应 PR 的作者。
 5. 作者修复、推送，CI 通过后人工确认关闭 issue。
 
-**涉及的概念**：[GitHub 集成](/github-integration) → [issue](/issues) → [小队](/squads) → [在评论里 @智能体](/mentioning-agents)
+**涉及的概念**：[自动化](/autopilots) → [issue](/issues) → [小队](/squads) → [在评论里 @智能体](/mentioning-agents)
 
 ## 怎么开始
 
